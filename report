@@ -1,0 +1,21 @@
+Lexi Christiansen
+WEB SERVER Report
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+IO:
+
+My web server uses epolling to handle I/O.  There is one listening socket.  When the listening socket has I/O, it adds the new client to the epoller. (see server.cc main method.)  The server loops and does a poll, handling each client that has input awaiting.
+
+It handles multiple requests on one TCP connection (In accordance with HTTP 1.1) by only closing a socket if it was closed by the client already (See handler.cc L141, L156, and Utils.h L220.), or if it timed out (see server.cc L75 and TimeOutSockets method). 
+
+
+Timeouts:
+
+Timeout second can be set in .config file as a parameter.  The config file is read in by the server and the timeout is parsed out of it (see server.cc L14). Then the timeout is used as an argument in the server.cc TimeOutSockets method (see L204).
+
+
+Caching:
+
+Each socket has its own cache (see handler.h L124 & L119, where a handler object has a socket and cache).  Each client uses non-blocking socket I/O and continues to call recv() on the client until it returns an error code indicating that no data is available (see handler.cc L141 where the handler calls read_all_available, and Utils.cc's read_all_available function, particularly L800 where it says MSG_DONTWAIT).
+
+
